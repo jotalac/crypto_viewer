@@ -25,8 +25,6 @@ void loop() {
   BtcData fetched_data = fetch_btc_data();
   int price = fetched_data.price;
   float price_change = fetched_data.price_change_percentage;
-
-  create_sprite();
   
   if (price != -1) {
     render_price(price, price_change, "BTC/USD", "*24h");
