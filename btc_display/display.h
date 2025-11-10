@@ -16,4 +16,4 @@ void draw_price(int price);
 
 void draw_price_change(String price_change, String time_frame);
 
-void render_price(const int price, const String& price_change, const String& currency_title, const String time_frame);
+void render_price(const int price, const float price_change, const String& currency_title, const String time_frame);

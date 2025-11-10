@@ -1,5 +1,6 @@
 #include "utils.h"
 #include <WiFi.h>
+#include <cstdio>
 
 
 std::string format_price(int number) {
@@ -28,21 +29,25 @@ std::string format_price(int number) {
 
 
 std::string format_price_change(float value, int precision) {
-    std::array<char, 32> buffer; 
+    char buffer[16]; 
+
+    char format_string[8]; 
+    snprintf(format_string, sizeof(format_string), "%%.%df", precision);
     
-    auto [ptr, ec] = std::to_chars(
-        buffer.data(),
-        buffer.data() + buffer.size(),
-        value,
-        std::chars_format::fixed,
-        precision // This is the '2' for 2 decimal places
+    int length = snprintf(
+        buffer, 
+        sizeof(buffer), 
+        format_string, 
+        value
     );
 
-    if (ec != std::errc()) {
-        return "ERROR"; // Handle error appropriately
+    // Error check (optional, but good practice)
+    if (length < 0 || length >= sizeof(buffer)) {
+        return "ERR"; 
     }
 
-    return std::string(buffer.data(), ptr);
+    // Convert the C-style array to a C++ string
+    return std::string(buffer);
 }
 
 

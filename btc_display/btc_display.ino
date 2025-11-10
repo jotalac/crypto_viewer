@@ -14,7 +14,7 @@ void setup() {
   tft.fillScreen(TFT_BLACK);
   
   create_sprite();
-  render_price(0, 0.0, "BTC/USD", "*24h");
+  render_price(0, 0.0f, "BTC/USD", "*24h");
 
   setup_wifi(ssid, password);
 }

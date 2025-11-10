@@ -52,36 +52,38 @@ void draw_price(int price) {
 }
 
 void draw_price_change(float price_change, String time_frame) {
-  unit16_t bg_color;
-  std::string display_string;
+  uint16_t bg_color;
+  String display_string;
 
   //set the dispaly string
-  if (price_change == 0.0) {
-    display_string = "..."
+  if (price_change == 0.0f) {
+    display_string = "...";
   } else {
-    display_string = format_price_change(price_change, 2);
+    std::string temp = format_price_change(price_change, 2) + "%"; 
+    display_string = String(temp.c_str());
   }
 
   //set the backgournd color
   if (price_change < 0) {
     bg_color = TFT_RED;
   } else {
-    bg_color = TFT_GREEN;
+    display_string = "+ " + display_string;
+    bg_color = DARK_GREEN;
   }
 
   spr.loadFont(mono_medium);
   spr.setTextDatum(MC_DATUM);
 
   int padding = 10;
-  int textWidth = spr.textWidth(price_change);
+  int textWidth = spr.textWidth(display_string);
   int textHeight = spr.fontHeight();
 
   int x = spr.width() / 2;
   int y = 160;
 
-  spr.fillRoundRect(x - textWidth / 2 - padding, y - textHeight / 2 - padding, textWidth + padding * 2, textHeight + padding * 2, 10, TFT_RED);
+  spr.fillRoundRect(x - textWidth / 2 - padding, y - textHeight / 2 - padding, textWidth + padding * 2, textHeight + padding * 2, 10, bg_color);
   spr.setTextColor(TFT_WHITE, TFT_TRANSPARENT);
-  spr.drawString(String(price_change), x, y - 5);
+  spr.drawString(display_string, x, y - 5);
 
   spr.unloadFont();
 
@@ -97,7 +99,7 @@ void draw_price_change(float price_change, String time_frame) {
 }
 
 
-void render_price(const int price, const float& price_change, const String& currency_title, const String time_frame) {
+void render_price(const int price, const float price_change, const String& currency_title, const String time_frame) {
   tft.fillScreen(TFT_BLACK);
   
   print_background();
