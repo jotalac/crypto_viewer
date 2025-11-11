@@ -3,8 +3,10 @@
 #include "network.h"
 
 // --- Wi-Fi Credentials ---
-const char* ssid = "Honor 20";
-const char* password = "nevimasi123";
+// const char* ssid = "Honor 20";
+const char* ssid = "Trisolaris";
+const char* password = "abraKA27+dabRA-";
+
 
 void setup() {
   Serial.begin(9600);
@@ -14,7 +16,7 @@ void setup() {
   tft.fillScreen(TFT_BLACK);
   
   create_sprite();
-  render_price(0, 0.0f, "BTC/USD", "*24h");
+  render_price(0, 0.0f, "FETCHING DATA...", "*24h");
 
   setup_wifi(ssid, password);
 }
@@ -22,16 +24,18 @@ void setup() {
 void loop() {
   Serial.println("Fetching new price...");
   
-  BtcData fetched_data = fetch_btc_data();
+  CoinData fetched_data = fetch_coin_data();
   int price = fetched_data.price;
   float price_change = fetched_data.price_change_percentage;
+  std::string coin_symbol = fetched_data.symbol;
   
   if (price != -1) {
-    render_price(price, price_change, "BTC/USD", "*24h");
+    render_price(price, price_change, String(coin_symbol.c_str()), "*24h");
+    delay(1000 * 60 * 2); 
   } else {
     spr.drawString("Error fetching price", 20, 100);
     spr.pushSprite(0, 0);
+    delay(1000 * 30);
   }
 
-  delay(300000); 
 }

@@ -2,12 +2,14 @@
 #define NETWORK_H
 
 #include <vector>
+#include <string>
 
-struct BtcData {
+struct CoinData {
   int price;
   float price_change_percentage;
+  std::string symbol;
 };
 
-BtcData fetch_btc_data();
+CoinData fetch_coin_data();
 
 #endif

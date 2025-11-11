@@ -32,7 +32,7 @@ void draw_curreny_title(String currency_title) {
   spr.setTextColor(TFT_WHITE, TFT_TRANSPARENT);
   
   spr.loadFont(mono_small);
-  spr.drawString(currency_title, 20, 20);
+  spr.drawString(currency_title , 20, 20);
   spr.unloadFont();
 }
 
@@ -44,9 +44,14 @@ void draw_price(int price) {
     tempPriceString = "$ " + format_price(price);
   }
   String priceDisplay(tempPriceString.c_str());
+
+  if (priceDisplay.length() <= 9) {
+    spr.loadFont(mono_bold_50);
+  } else {
+    spr.loadFont(mono_medium);
+  }
   
   spr.setTextColor(TFT_WHITE, TFT_TRANSPARENT);
-  spr.loadFont(mono_bold_50);
   spr.drawString(priceDisplay, 20, 60);
   spr.unloadFont();
 }
