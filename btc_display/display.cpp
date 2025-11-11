@@ -114,3 +114,12 @@ void render_price(const int price, const float price_change, const String& curre
 
   spr.pushSprite(0 ,0);
 }
+
+
+void display_error_screen(String message) {
+  spr.fillRect(0, 0, 280, 240, TFT_BLACK);
+
+  spr.loadFont(mono_small);
+  spr.drawString(message, 20, 100);
+  spr.pushSprite(0, 0);
+}

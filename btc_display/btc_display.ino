@@ -33,8 +33,7 @@ void loop() {
     render_price(price, price_change, String(coin_symbol.c_str()), "*24h");
     delay(1000 * 60 * 2); 
   } else {
-    spr.drawString("Error fetching price", 20, 100);
-    spr.pushSprite(0, 0);
+    display_error_screen("Error fetching price");
     delay(1000 * 30);
   }
 

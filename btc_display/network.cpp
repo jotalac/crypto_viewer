@@ -9,6 +9,7 @@ CoinData fetch_coin_data() {
 
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("WiFi not connected");
+    // setup_wifi()
     return data;
   }
 
