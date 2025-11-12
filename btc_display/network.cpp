@@ -3,6 +3,7 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
+#include "config.h"
 
 CoinData fetch_coin_data() {
   CoinData data = {-1, 0.0};
@@ -15,7 +16,7 @@ CoinData fetch_coin_data() {
 
   HTTPClient http;
   http.setTimeout(15000);
-  http.begin("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin");
+  http.begin("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=" + coin_name);
   
   Serial.println("Sending request...");
   int httpCode = http.GET();

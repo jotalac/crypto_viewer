@@ -1,12 +1,7 @@
 #include "display.h"
 #include "utils.h"
 #include "network.h"
-
-// --- Wi-Fi Credentials ---
-// const char* ssid = "Honor 20";
-const char* ssid = "Trisolaris";
-const char* password = "abraKA27+dabRA-";
-
+#include "config.h"
 
 void setup() {
   Serial.begin(9600);
@@ -18,7 +13,7 @@ void setup() {
   create_sprite();
   render_price(0, 0.0f, "FETCHING DATA...", "*24h");
 
-  setup_wifi(ssid, password);
+  setup_wifi(WIFI_SSID, WIFI_PASSWORD);
 }
 
 void loop() {
