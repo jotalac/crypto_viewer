@@ -16,7 +16,7 @@ CoinData fetch_coin_data() {
 
   HTTPClient http;
   http.setTimeout(15000);
-  http.begin("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=" + coin_name);
+  http.begin("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=" + COIN_NAME);
   
   Serial.println("Sending request...");
   int httpCode = http.GET();

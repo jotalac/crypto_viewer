@@ -26,7 +26,7 @@ void loop() {
   
   if (price != -1) {
     render_price(price, price_change, String(coin_symbol.c_str()), "*24h");
-    delay(1000 * 60 * 2); 
+    delay(1000 * 60 * 10); 
   } else {
     display_error_screen("Error fetching price");
     delay(1000 * 30);
