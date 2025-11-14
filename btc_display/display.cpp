@@ -36,7 +36,7 @@ void draw_curreny_title(String currency_title) {
   spr.unloadFont();
 }
 
-void draw_price(int price) {
+void draw_price(float price) {
   std::string tempPriceString;  
   if (price == 0) {
     tempPriceString = "$ ...";
@@ -104,7 +104,7 @@ void draw_price_change(float price_change, String time_frame) {
 }
 
 
-void render_price(const int price, const float price_change, const String& currency_title, const String time_frame) {
+void render_price(const float price, const float price_change, const String& currency_title, const String time_frame) {
   tft.fillScreen(TFT_BLACK);
   
   print_background();
@@ -122,4 +122,26 @@ void display_error_screen(String message) {
   spr.loadFont(mono_small);
   spr.drawString(message, 20, 100);
   spr.pushSprite(0, 0);
+
+  spr.unloadFont();
+}
+
+void display_wifi_setup_message() {
+  spr.fillRect(0, 0, 280, 240, TFT_BLACK);
+
+  spr.loadFont(mono_small);
+
+  spr.setTextColor(TFT_WHITE, TFT_TRANSPARENT);
+  spr.drawString("WiFi Setup", 20, 20);
+  spr.drawString("Connect to:", 20, 50);
+
+  spr.drawString("SSID:", 30, 90);
+  spr.drawString("crypto_display", 40, 110);
+  
+  spr.drawString("Password:", 30, 140);
+  spr.drawString("crypto123", 40, 160);
+  
+  spr.pushSprite(0, 0);
+
+  spr.unloadFont();
 }

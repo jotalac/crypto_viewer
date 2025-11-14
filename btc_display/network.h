@@ -5,7 +5,7 @@
 #include <string>
 
 struct CoinData {
-  int price;
+  float price;
   float price_change_percentage;
   std::string symbol;
 };

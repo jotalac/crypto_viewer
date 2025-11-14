@@ -1,9 +1,10 @@
 {
     "configurations": [
         {
-            "name": "Linux",
+            "name": "Arduino",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "/home/jotalac/Arduino/libraries/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

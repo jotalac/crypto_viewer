@@ -18,7 +18,7 @@ CoinData fetch_coin_data() {
   http.setTimeout(15000);
   http.begin("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=" + COIN_NAME);
   
-  Serial.println("Sending request...");
+  Serial.println("Sending request to: ");
   int httpCode = http.GET();
   Serial.printf("HTTP Code: %d\n", httpCode);
 
@@ -37,9 +37,7 @@ CoinData fetch_coin_data() {
       if (doc.is<JsonArray>() && doc.size() > 0) {
         JsonObject coin_json = doc[0];
 
-        float priceFloat = coin_json["current_price"];
-        data.price = (int)priceFloat;
-        Serial.printf("Price found: %.2f -> %d\n", priceFloat, data.price);
+        data.price = coin_json["current_price"];
 
         data.price_change_percentage = coin_json["price_change_percentage_24h"];
         Serial.printf("Change found: %.2f\n", data.price_change_percentage);
