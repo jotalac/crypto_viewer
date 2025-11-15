@@ -10,7 +10,14 @@ void setup() {
   Serial.begin(9600);
   delay(500);
 
+  // button for config mode
   pinMode(BUTTON_PIN, INPUT_PULLUP);
+
+  //turn on external antenna
+  pinMode(3, OUTPUT);    // RF switch power on
+  digitalWrite(3, LOW);
+  pinMode(14, OUTPUT);   // select external antenna
+  digitalWrite(14, HIGH);
 
   tft.init();
   tft.setRotation(1);
