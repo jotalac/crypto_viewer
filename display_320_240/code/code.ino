@@ -14,35 +14,36 @@ void setup() {
 
   tft.init();
   tft.setRotation(1);
-  tft.fillScreen(TFT_BLACK);
+  tft.setSwapBytes(true);
   
-  create_sprite();
-
   //setup wifi
-  display_wifi_setup_message();
+  display_message("Connecting...");
 
   if (!setup_wifi_manager()) {
-    display_error_screen("Wifi connection failed");
+    display_message("Wifi connection failed");
     delay(2000);
     ESP.restart();
   }
 
-  render_price(0, 0.0f, "FETCHING DATA...", "*24h");
-
+  // render_price(0, 0.0f, "FETCHING DATA...", "*24h");
+  // render_price(1010875, 21.2f, "Bitcoin", "*24h");
+  
   // setup_wifi(WIFI_SSID, WIFI_PASSWORD);
   last_fetch_time = 0;
 }
 
-void loop() {
+void loop() {  
   if (check_config_button()) {
     Serial.println("Config mode entered");
 
-    display_wifi_setup_message();
+    display_wifi_setup_message("--Configue--");
 
     if (start_config_portal_on_demand()) {
+      display_message("Config saved\nRestarting...");
+      delay(2000);
       ESP.restart(); //restart to apply changes
     } else {
-      display_error_screen("Config canceled");
+      display_message("Config canceled");
       last_fetch_time = 0; //fetch imidietly
     }
   }
@@ -51,6 +52,13 @@ void loop() {
   unsigned long current_time = millis();
   if (current_time - last_fetch_time >= FETCH_INTERVAL || last_fetch_time == 0) {
     Serial.println("Fetching new price...");
+
+    //check if wifi is connected
+    if (!check_wifi_connection()) {
+      display_message("Wifi reconnect failed\nRestarting...");
+      delay(2000);
+      ESP.restart();
+    };
 
     CoinData fetched_data = fetch_coin_data();
     float price = fetched_data.price;
@@ -61,7 +69,7 @@ void loop() {
       render_price(price, price_change, String(coin_symbol.c_str()), "*24h");
       last_fetch_time = current_time; 
     } else {
-      display_error_screen("Error fetching price");
+      display_message("Error fetching price");
       // Retry in 30 seconds instead of 10 minutes on error
       last_fetch_time = current_time - FETCH_INTERVAL + 30000;
     }

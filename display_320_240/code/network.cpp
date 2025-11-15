@@ -14,9 +14,13 @@ CoinData fetch_coin_data() {
     return data;
   }
 
+  String coin_name = get_coin_name();
+  Serial.print("Fetching data for: ");
+  Serial.println(coin_name);
+
   HTTPClient http;
   http.setTimeout(15000);
-  http.begin("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=" + COIN_NAME);
+  http.begin("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=" + coin_name);
   
   Serial.println("Sending request to: ");
   int httpCode = http.GET();

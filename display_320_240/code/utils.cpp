@@ -2,7 +2,11 @@
 #include <WiFi.h>
 #include <cstdio>
 #include <WiFiManager.h>
+#include <Preferences.h>
 #include "config.h"
+#include "display.h"
+
+Preferences preferences;
 
 std::string format_price(float number) {
     if (number == 0) {
@@ -103,9 +107,28 @@ bool setup_wifi_manager() {
     wm.setConfigPortalTimeout(PORTAL_TIMEOUT);
     wm.setClass("invert"); //dark mode
 
+    //callback when entering web portal config mode
+    wm.setAPCallback([](WiFiManager *myWiFiManager) {
+        Serial.println("Entered config mode");
+        display_wifi_setup_message("Wifi setup");
+    });
+
+    bool params_saved = false;
+    wm.setSaveParamsCallback([&params_saved]() {
+        Serial.println("SaveParams callback triggered!");
+        params_saved = true;
+    });
+
+
+    // Load saved coin name from preferences
+    preferences.begin("crypto", true);  // false = read/write
+    String saved_coin = preferences.getString("coin", "bitcoin");  // default = "bitcoin"
+    preferences.end();
+
     //custom params for coin selection
     WiFiManagerParameter custom_coin("coin", "Coin name (bitcoin, ethereum, doge, ...)", "bitcoin", 50);
     wm.addParameter(&custom_coin);
+    
 
     Serial.println("Starting WifiManager...");
 
@@ -120,11 +143,55 @@ bool setup_wifi_manager() {
         return false;
     }
 
-    COIN_NAME = String(custom_coin.getValue());
-
     Serial.println("Wifi connected");
+
+    //set new coin only if it was edited
+    // otherwise it will be always bitcoin (the default paremeter)
+    if (params_saved) { 
+        String new_coin = String(custom_coin.getValue());
+        set_coin_name(new_coin);
+        Serial.print("Saved new coin from portal: ");
+        Serial.println(new_coin);
+    } else {
+        Serial.print("Skipped preference save, portal was not used. Current coin: ");
+        Serial.println(saved_coin);
+    }
+
     return true;
     
+}
+
+
+bool check_wifi_connection() {
+    if (wifi_connected()) {
+        return true;
+    }
+
+    display_message("Wifi disconnected\nReconnecting...");
+    WiFi.reconnect();
+
+    int attempts = 0;
+    while (WiFi.status() != WL_CONNECTED && attempts < 50) {
+        delay(1000);
+        Serial.print(".");
+        attempts++;
+    }
+    
+    Serial.println();
+    
+    if (WiFi.status() == WL_CONNECTED) {
+        Serial.println("WiFi reconnected successfully!");
+        Serial.print("IP address: ");
+        Serial.println(WiFi.localIP());
+        return true;
+    }
+    
+    Serial.println("WiFi reconnection failed");
+    return false;
+}
+
+bool wifi_connected() {
+    return WiFi.status() == WL_CONNECTED;
 }
 
 //check if button is hold for 3 seconds
@@ -165,22 +232,57 @@ bool start_config_portal_on_demand() {
     
     wm.setConfigPortalTimeout(PORTAL_TIMEOUT);
     wm.setClass("invert");
+    wm.setBreakAfterConfig(true);
+
+    // Load current coin name from preferences
+    preferences.begin("crypto", true);  // true = read-only
+    String current_coin = preferences.getString("coin", "bitcoin");
+    preferences.end();
     
     // Custom parameter for coin selection with current value
-    WiFiManagerParameter custom_coin("coin", "Coin name (bitcoin, ethereum, doge, ...)", COIN_NAME.c_str(), 50);
+    WiFiManagerParameter custom_coin("coin", "Coin name (bitcoin, ethereum, doge, ...)", current_coin.c_str(), 50);
     wm.addParameter(&custom_coin);
+
+    // Track if config was saved
+    bool config_saved = false;
+    
+    // Capture by reference - this is the key!
+    wm.setSaveConfigCallback([&config_saved]() {
+        Serial.println("Save callback triggered - config saved!");
+        config_saved = true;
+        // return true;
+    });
     
     // Start portal blocking mode
     bool success = wm.startConfigPortal("crypto_display", "crypto123");
     
-    if (success) {
-        COIN_NAME = String(custom_coin.getValue());
-        Serial.println("Configuration updated!");
-        Serial.print("New coin: ");
-        Serial.println(COIN_NAME);
-        return true;
-    }
+    // Save coin name to preferences after portal closes
+    String new_coin = String(custom_coin.getValue());
+    set_coin_name(new_coin);
+
+    Serial.print("Coin name saved to preferences: ");
+    Serial.println(new_coin);
     
-    Serial.println("Configuration portal timed out or was cancelled");
-    return false;
+    if (success) {
+        Serial.println("WiFi connected from portal");
+        return true;
+    } else if (config_saved) {
+        Serial.println("Config was saved but WiFi unchanged");
+        return true;
+    } else {
+        Serial.println("Portal timed out without saving");
+        return false;
+    }
+}
+
+String get_coin_name() {
+    preferences.begin("crypto", true);
+    String coin = preferences.getString("coin", "bitcoin");
+    preferences.end();
+    return coin;
+}
+void set_coin_name(String new_coin_name) {
+    preferences.begin("crypto", false); // Read/write
+    preferences.putString("coin", new_coin_name);
+    preferences.end();
 }
