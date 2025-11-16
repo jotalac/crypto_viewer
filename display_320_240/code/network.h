@@ -7,6 +7,8 @@
 struct CoinData {
   float price;
   float price_change_percentage;
+  float ath_price;
+  float ath_percentage;
   std::string symbol;
 };
 

@@ -17,7 +17,7 @@ void print_background() {
 }
 
 void draw_curreny_title(String currency_title) {
-  tft.setTextColor(TFT_WHITE, TFT_TRANSPARENT);
+  tft.setTextColor(LIGHT_GRAY, TFT_TRANSPARENT);
   
   tft.loadFont(mono_small);
   tft.drawString(currency_title , 20, 20);
@@ -50,7 +50,7 @@ void draw_price(float price) {
 
   tft.setTextDatum(MC_DATUM);
   tft.setTextColor(TFT_WHITE, TFT_TRANSPARENT);
-  tft.drawString(priceDisplay, tft.width() / 2, 80);
+  tft.drawString(priceDisplay, tft.width() / 2, 70);
   tft.unloadFont();
 
   tft.setTextDatum(TL_DATUM);
@@ -86,7 +86,7 @@ void draw_price_change(float price_change, String time_frame) {
   int textHeight = tft.fontHeight();
 
   int x = tft.width() / 2;
-  int y = 160;
+  int y = 150;
 
   tft.fillRoundRect(x - textWidth / 2 - padding, y - textHeight / 2 - padding, textWidth + padding * 2, textHeight + padding * 2, 10, bg_color);
   tft.setTextColor(TFT_WHITE, TFT_TRANSPARENT);
@@ -97,29 +97,46 @@ void draw_price_change(float price_change, String time_frame) {
   //print the change time frame
 
   tft.loadFont(mono_small);
-  tft.setTextColor(TFT_WHITE, TFT_TRANSPARENT);
+  tft.setTextColor(LIGHT_GRAY, TFT_TRANSPARENT);
   tft.drawString(time_frame, x, y + 40);
   tft.unloadFont();
 
   tft.setTextDatum(TL_DATUM); // Reset to default
 }
 
+void draw_ath_data(float ath_price, float ath_change) {
+  tft.setTextDatum(MC_DATUM);
+  tft.loadFont(mono_small);
+  tft.setTextColor(TFT_WHITE, TFT_TRANSPARENT);
 
-void render_price(const float price, const float price_change, const String& currency_title, const String time_frame) {
+  // std::string change_formated = format_price_change(ath_change, 2) + "%";
+  std::string price_format = format_price(ath_price);
+  std::string change_format = format_price_change(ath_change, 2) + "%";
+
+  tft.drawString("ATH: $ " + String(price_format.c_str()) + " | " + String(change_format.c_str()), tft.width() / 2, 220);
+  // tft.drawString("ATH change: " + String(change_formated.c_str()), 150, 210);
+
+  tft.unloadFont();
+  tft.setTextDatum(TL_DATUM);
+}
+
+
+void render_price(CoinData &fetchedData, const String time_frame) {
   
   // print_background(); // prints image
-  uint16_t color = price_change >= 0 ? DARK_YELLOW : TFT_RED;
+  uint16_t color = fetchedData.price_change_percentage >= 0 ? DARK_YELLOW : TFT_RED;
   draw_gradient(color);
 
-  draw_curreny_title(currency_title);
-  draw_price(price);
-  draw_price_change(price_change, time_frame);
+  draw_curreny_title(String(fetchedData.symbol.c_str()));
+  draw_price(fetchedData.price);
+  draw_price_change(fetchedData.price_change_percentage, time_frame);
+  draw_ath_data(fetchedData.ath_price, fetchedData.ath_percentage);
 }
 
 
 void display_message(String message) {
   // tft.fillRect(0, 0, tft.width(), tft.height(), TFT_BLACK);
-  draw_gradient(TFT_RED);
+  draw_gradient(DARK_PURPLE);
 
   tft.setTextDatum(MC_DATUM);
   tft.loadFont(mono_small);
@@ -130,7 +147,7 @@ void display_message(String message) {
 }
 
 void display_wifi_setup_message(String message) {
-  tft.fillRect(0, 0, tft.width(), tft.height(), TFT_BLACK);
+  draw_gradient(DARK_BLUE);
 
   
   tft.setTextColor(TFT_SKYBLUE, TFT_TRANSPARENT);

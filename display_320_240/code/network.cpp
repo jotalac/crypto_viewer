@@ -46,6 +46,12 @@ CoinData fetch_coin_data() {
         data.price_change_percentage = coin_json["price_change_percentage_24h"];
         Serial.printf("Change found: %.2f\n", data.price_change_percentage);
 
+        data.ath_price = coin_json["ath"];
+        Serial.println(data.ath_price);
+
+        data.ath_percentage = coin_json["ath_change_percentage"];
+        Serial.println(data.ath_percentage);
+
         data.symbol = std::string(coin_json["name"]);
         Serial.printf("Symbol found: %s\n", data.symbol);
 
