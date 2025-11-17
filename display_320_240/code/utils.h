@@ -18,10 +18,10 @@ void setup_wifi(const char* ssid, const char* password);
 bool setup_wifi_manager();
 bool check_wifi_connection();
 bool wifi_connected();
-
 bool start_config_portal_on_demand();
-bool check_config_button(); 
-bool check_coin_change_button();
+
+// bool check_config_button(); 
+// bool check_coin_change_button();
 
 String get_coin_name();
 String get_coin_name(int index);
@@ -29,5 +29,5 @@ void set_coin_names(String coin1, String coin2, String coin3);
 int get_current_coin_index();
 void set_current_coin_index(int index);
 
-void go_to_next_coin();
+bool go_to_next_coin();
 int get_coin_count(); //how many coins are configured

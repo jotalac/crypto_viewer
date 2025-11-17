@@ -212,60 +212,60 @@ bool wifi_connected() {
     return WiFi.status() == WL_CONNECTED;
 }
 
-//check if button is hold for 3 seconds
-bool check_config_button() {
-    static unsigned long button_press_start = 0;
-    static bool button_was_pressed = false;
+// //check if button is hold for 3 seconds
+// bool check_config_button() {
+//     static unsigned long button_press_start = 0;
+//     static bool button_was_pressed = false;
     
-    bool button_pressed = (digitalRead(BUTTON_PIN) == LOW);
+//     bool button_pressed = (digitalRead(BUTTON_PIN) == LOW);
     
-    if (button_pressed && !button_was_pressed) {
-        // Button just pressed
-        button_press_start = millis();
-        button_was_pressed = true;
-    } 
-    else if (!button_pressed && button_was_pressed) {
-        // Button released
-        button_was_pressed = false;
-        button_press_start = 0;
-    }
-    else if (button_pressed && button_was_pressed) {
-        // Button is being held
-        unsigned long hold_time = millis() - button_press_start;
-        if (hold_time >= CONFIG_PRESS_TIME) {
-            button_was_pressed = false;
-            button_press_start = 0;
-            return true;  // Button held long enough
-        }
-    }
+//     if (button_pressed && !button_was_pressed) {
+//         // Button just pressed
+//         button_press_start = millis();
+//         button_was_pressed = true;
+//     } 
+//     else if (!button_pressed && button_was_pressed) {
+//         // Button released
+//         button_was_pressed = false;
+//         button_press_start = 0;
+//     }
+//     else if (button_pressed && button_was_pressed) {
+//         // Button is being held
+//         unsigned long hold_time = millis() - button_press_start;
+//         if (hold_time >= CONFIG_PRESS_TIME) {
+//             button_was_pressed = false;
+//             button_press_start = 0;
+//             return true;  // Button held long enough
+//         }
+//     }
     
-    return false;
-}
+//     return false;
+// }
 
-bool check_coin_change_button() {
-    static unsigned long button_press_start = 0;
-    static bool button_was_pressed = false;
+// bool check_coin_change_button() {
+//     static unsigned long button_press_start = 0;
+//     static bool button_was_pressed = false;
     
-    bool button_pressed = (digitalRead(BUTTON_PIN) == LOW);
+//     bool button_pressed = (digitalRead(BUTTON_PIN) == LOW);
     
-    if (button_pressed && !button_was_pressed) {
-        button_press_start = millis();
-        button_was_pressed = true;
-    } 
-    else if (!button_pressed && button_was_pressed) {
-        // Button released - check duration
-        unsigned long hold_time = millis() - button_press_start;
-        button_was_pressed = false;
-        button_press_start = 0;
+//     if (button_pressed && !button_was_pressed) {
+//         button_press_start = millis();
+//         button_was_pressed = true;
+//     } 
+//     else if (!button_pressed && button_was_pressed) {
+//         // Button released - check duration
+//         unsigned long hold_time = millis() - button_press_start;
+//         button_was_pressed = false;
+//         button_press_start = 0;
         
-        // Short press (less than config time)
-        if (hold_time >= BUTTON_SHORT_PRESS_TIME && hold_time < CONFIG_PRESS_TIME) {
-            return true;
-        }
-    }
+//         // Short press (less than config time)
+//         if (hold_time >= BUTTON_SHORT_PRESS_TIME && hold_time < CONFIG_PRESS_TIME) {
+//             return true;
+//         }
+//     }
     
-    return false;
-}
+//     return false;
+// }
 
 // Start configuration portal on demand
 bool start_config_portal_on_demand() {
@@ -357,9 +357,9 @@ void set_current_coin_index(int index) {
 }
 
 // Cycle to next coin
-void go_to_next_coin() {
+bool go_to_next_coin() {
     int total = get_coin_count();
-    if (total <= 1) return;  // Nothing to cycle
+    if (total <= 1) return false;  // Nothing to cycle
     
     int current = get_current_coin_index();
     int next = (current + 1) % total;
@@ -370,6 +370,8 @@ void go_to_next_coin() {
     Serial.print(current);
     Serial.print(" to coin ");
     Serial.println(next);
+
+    return true;
 }
 
 // Get total number of configured coins

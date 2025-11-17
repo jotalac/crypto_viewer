@@ -2,16 +2,19 @@
 #include "utils.h"
 #include "network.h"
 #include "config.h"
+#include "buzzer.h"
+#include "button_control.h"
 
 unsigned long last_fetch_time = 0;
 const unsigned long FETCH_INTERVAL = 1000 * 60 * 10;  // 10 minutes
 
 void setup() {
   Serial.begin(9600);
-  delay(500);
-
   // button for config mode
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  pinMode(BUTTON_COIN_PIN, INPUT_PULLUP);
+  pinMode(BUTTON_CONFIG_PIN, INPUT_PULLUP);
+  pinMode(BUZZER_PIN, OUTPUT);
+
   turn_on_external_antenna();
 
   tft.init();
@@ -20,6 +23,9 @@ void setup() {
   
   //setup wifi
   display_message("Connecting...");
+  //play boot sound
+  play_startup_sound();
+
 
   if (!setup_wifi_manager()) {
     display_message("Wifi connection failed");
@@ -36,28 +42,39 @@ void setup() {
 }
 
 void loop() {  
+  // === check for coin button === 
   // Check for short press (cycle coins)
   if (check_coin_change_button()) {    
-    go_to_next_coin();
-    Serial.println("Cycling to next coin");
+    //try to go to next coin if only one coin is setup dont do anything
+    if (go_to_next_coin()) {
+      Serial.println("Cycling to next coin");  
+      // Show indicator
+      int current_index = get_current_coin_index();
+      String coin_name = get_coin_name();
+      display_message("Switching to: " + coin_name);
+      delay(1000);
       
-    // Show indicator
-    int current_index = get_current_coin_index();
-    String coin_name = get_coin_name();
-    display_message("Switching to: " + coin_name);
-    delay(1000);
-    
+      // Force immediate fetch
+      last_fetch_time = 0;
+    }
+  }
+
+  if (check_coin_fetch_button()) {    
+    Serial.println("Fetching new price");
+    display_message("Fetching new price");    
     // Force immediate fetch
     last_fetch_time = 0;
   }
 
+  // === check for config button ===
   if (check_config_button()) {
     Serial.println("Config mode entered");
+    play_config_sound();
 
     display_wifi_setup_message("Configue");
 
     if (start_config_portal_on_demand()) {
-      display_message("Config saved\nRestarting...");
+      display_message("Config saved, restarting...");
       delay(2000);
       ESP.restart(); //restart to apply changes
     } else {
@@ -65,6 +82,15 @@ void loop() {
       last_fetch_time = 0; //fetch imidietly
     }
   }
+
+  if (check_reset_button()) {
+    Serial.println("Reseting button pressed");
+
+    display_message("Reseting device");
+    delay(1000);
+    ESP.restart();
+  }
+
 
   //check if we should fetch new data
   unsigned long current_time = millis();
