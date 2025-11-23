@@ -1,12 +1,10 @@
 # Crypto Price Viewer
 
-A DIY cryptocurrency price ticker that displays real-time prices for your favorite coins.
-
-![Crypto Viewer](https://via.placeholder.com/400x300.png?text=Project+Image+Here)
+A DIY cryptocurrency price dispaly.
 
 ## Description
 
-This project is a simple yet powerful cryptocurrency price viewer. It fetches real-time data from a cryptocurrency API and displays it on a screen. The device is housed in a 3D-printed case and features button controls and a buzzer for notifications.
+This project is diy simple cryptocurrency price viewer. It fetches real-time data from a cryptocurrency API and displays it on a screen. The device is housed in a 3D-printed case and features button controls and a buzzer.
 
 ## Features
 
