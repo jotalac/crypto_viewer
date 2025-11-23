@@ -7,10 +7,13 @@
 
 unsigned long last_fetch_time = 0;
 const unsigned long FETCH_INTERVAL = 1000 * 60 * 10;  // 10 minutes
+CoinData all_coins_data[3] = {{}, {}, {}};
+
 
 void setup() {
   Serial.begin(9600);
-  // button for config mode
+
+  // setup buttons and anthena  pins
   pinMode(BUTTON_COIN_PIN, INPUT_PULLUP);
   pinMode(BUTTON_CONFIG_PIN, INPUT_PULLUP);
   pinMode(BUZZER_PIN, OUTPUT);
@@ -33,12 +36,7 @@ void setup() {
     ESP.restart();
   }
 
-  // render_price(0, 0.0f, "FETCHING DATA...", "*24h");
-  // CoinData cd = CoinData{132}
-  // render_price(1010875, 21.2f, "Bitcoin", "*24h");
-  
-  // setup_wifi(WIFI_SSID, WIFI_PASSWORD);
-  last_fetch_time = 0;
+  // last_fetch_time = 0;
 }
 
 void loop() {  
@@ -52,10 +50,14 @@ void loop() {
       int current_index = get_current_coin_index();
       String coin_name = get_coin_name();
       display_message("Switching to: " + coin_name);
-      delay(1000);
+      delay(500);
       
       // Force immediate fetch
-      last_fetch_time = 0;
+      if (all_coins_data[current_index].symbol.empty()) {
+        last_fetch_time = 0;
+      } else {
+        render_price(all_coins_data[current_index], "*24h");
+      }
     }
   }
 
@@ -108,8 +110,11 @@ void loop() {
     float price = fetched_data.price;
     
     if (price != -1) {
+      //display new data
       render_price(fetched_data, "*24h");
-      last_fetch_time = current_time; 
+      last_fetch_time = current_time;
+      //update the saved vlaues
+      all_coins_data[get_current_coin_index()] = fetched_data; 
     } else {
       display_message("Error fetching price for: " + get_coin_name());
       // Retry in 30 seconds instead of 10 minutes on error
