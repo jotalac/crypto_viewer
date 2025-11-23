@@ -55,13 +55,6 @@ CoinData fetch_coin_data() {
         data.symbol = std::string(coin_json["name"]);
         Serial.printf("Symbol found: %s\n", data.symbol);
 
-        
-        // if (coin_json.containsKey("price_change_percentage_24h")) {
-          // data.price_change_percentage = coin_json["price_change_percentage_24h"];
-          // Serial.printf("Change found: %.2f\n", data.price_change_percentage);
-        // } else {
-          // Serial.println("ERROR: price_change_percentage_24h not found!");
-        // }
       } else {
         Serial.println("ERROR: Response is not an array or empty!");
       }
