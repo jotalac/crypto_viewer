@@ -1,6 +1,7 @@
 # Crypto Price Viewer
+<img src="https://github.com/user-attachments/assets/de9e33ff-97cf-471c-9c8e-d834ea47025f" alt="show" width="500"/> <img src="https://github.com/user-attachments/assets/31c8f4a4-144e-4ee1-9d21-d4405eb8c5b3" alt="show" height="500"/>
 
-A DIY cryptocurrency price dispaly.
+DIY cryptocurrency price dispaly.
 
 ## Description
 
@@ -51,7 +52,12 @@ This project uses the following hardware components:
 ## Usage guide
 ### Setup
 *   After first connection you will se this screen
+<img src="https://github.com/user-attachments/assets/8684bdb3-e5bb-4aa7-9c0a-28138ac52aac" alt="PXL_20251124_210215098" width="300"/>
+
 *   Connect to that wifi from your phone, and this setup screen will popup
+  
+<img width="300" alt="Screenshot_20251124-220306" src="https://github.com/user-attachments/assets/08509f34-7b9b-4976-8bbb-025185a181f6" />
+
 *   Select configue wifi
 *   Select your wifi ssid and fill in the password
 *   Below you can set up to 3 cryptocurrencies to be displayed on your display
@@ -127,6 +133,9 @@ The firmware is written in C++ using the Arduino framework.
 *  *solder the components according to the wiring diagram and tables*
 
 ### Wiring
+
+<img width="800" alt="diagram" src="https://github.com/user-attachments/assets/e3ca0593-2391-4eb1-86b7-1634981a195f" />
+<img width="500" alt="diagram2" src="https://github.com/user-attachments/assets/acf7307d-84e3-46d5-b092-d4b3a68824db" />
 
 **Display**
 
