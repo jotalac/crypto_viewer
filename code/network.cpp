@@ -49,7 +49,8 @@ CoinData fetch_coin_data() {
         data.ath_price = coin_json["ath"];
         Serial.println(data.ath_price);
 
-        data.ath_percentage = coin_json["ath_change_percentage"];
+        // data.ath_percentage = coin_json["ath_change_percentage"];
+        data.ath_percentage = 0.0;
         Serial.println(data.ath_percentage);
 
         data.symbol = std::string(coin_json["name"]);

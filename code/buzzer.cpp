@@ -32,3 +32,19 @@ void play_config_sound() {
 
     noTone(BUZZER_PIN);
 }
+
+void play_ath_sound() {
+    tone(BUZZER_PIN, 523, 70); // C5 (Middle C)
+    delay(70);
+    
+    tone(BUZZER_PIN, 659, 70); // E5 (Major 3rd)
+    delay(70);
+    
+    tone(BUZZER_PIN, 784, 70); // G5 (Perfect 5th)
+    delay(70);
+    
+    tone(BUZZER_PIN, 1047, 300); // C6 (Octave Up - The "Resolution")
+    delay(300);
+
+    noTone(BUZZER_PIN);
+}

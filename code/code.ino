@@ -40,59 +40,12 @@ void setup() {
 }
 
 void loop() {  
-  // === check for coin button === 
-  // Check for short press (cycle coins)
-  if (check_coin_change_button()) {    
-    //try to go to next coin if only one coin is setup dont do anything
-    if (go_to_next_coin()) {
-      Serial.println("Cycling to next coin");  
-      // Show indicator
-      int current_index = get_current_coin_index();
-      String coin_name = get_coin_name();
-      display_message("Switching to: " + coin_name);
-      delay(500);
-      
-      // Force immediate fetch
-      if (all_coins_data[current_index].symbol.empty()) {
-        last_fetch_time = 0;
-      } else {
-        render_price(all_coins_data[current_index], "*24h");
-      }
-    }
-  }
+  //check all button presses
+  check_btn_1_press();
+  check_btn1_hold();
 
-  if (check_coin_fetch_button()) {    
-    Serial.println("Fetching new price");
-    display_message("Fetching new price");    
-    // Force immediate fetch
-    last_fetch_time = 0;
-  }
-
-  // === check for config button ===
-  if (check_config_button()) {
-    Serial.println("Config mode entered");
-    play_config_sound();
-
-    display_wifi_setup_message("Configue");
-
-    if (start_config_portal_on_demand()) {
-      display_message("Config saved, restarting...");
-      delay(2000);
-      ESP.restart(); //restart to apply changes
-    } else {
-      display_message("Config canceled");
-      last_fetch_time = 0; //fetch imidietly
-    }
-  }
-
-  if (check_reset_button()) {
-    Serial.println("Reseting button pressed");
-
-    display_message("Reseting device");
-    delay(1000);
-    ESP.restart();
-  }
-
+  check_btn2_press();
+  check_btn2_hold();
 
   //check if we should fetch new data
   unsigned long current_time = millis();
@@ -115,6 +68,8 @@ void loop() {
       last_fetch_time = current_time;
       //update the saved vlaues
       all_coins_data[get_current_coin_index()] = fetched_data; 
+      //play sound if the current price is ath
+      if (fetched_data.ath_percentage >= 0) play_ath_sound();
     } else {
       display_message("Error fetching price for: " + get_coin_name());
       // Retry in 30 seconds instead of 10 minutes on error
@@ -123,4 +78,62 @@ void loop() {
   }
 
   delay(100);
+}
+
+void check_btn_1_press() {
+  if (check_coin_change_button()) {    
+      //try to go to next coin if only one coin is setup dont do anything
+      if (go_to_next_coin()) {
+        Serial.println("Cycling to next coin");  
+        // Show indicator
+        int current_index = get_current_coin_index();
+        String coin_name = get_coin_name();
+        display_message("Switching to: " + coin_name);
+        delay(500);
+        
+        // Force immediate fetch
+        if (all_coins_data[current_index].symbol.empty()) {
+          last_fetch_time = 0;
+        } else {
+          render_price(all_coins_data[current_index], "*24h");
+        }
+      }
+  }
+}
+
+void check_btn1_hold() {
+  if (check_coin_fetch_button()) {    
+    Serial.println("Fetching new price");
+    display_message("Fetching new price");    
+    // Force immediate fetch
+    last_fetch_time = 0;
+  }
+}
+
+void check_btn2_press() {
+  if (check_reset_button()) {
+    Serial.println("Reseting button pressed");
+
+    display_message("Reseting device");
+    delay(1000);
+    ESP.restart();
+  }
+}
+
+void check_btn2_hold() {
+  if (check_config_button()) {
+    Serial.println("Config mode entered");
+    play_config_sound();
+
+    display_wifi_setup_message("Configue");
+
+    if (start_config_portal_on_demand()) {
+      display_message("Config saved, restarting...");
+      delay(2000);
+      ESP.restart(); //restart to apply changes
+    } else {
+      display_message("Config canceled");
+      last_fetch_time = 0; //fetch imidietly
+    }
+  }
 }
