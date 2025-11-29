@@ -1,7 +1,10 @@
 #include "buzzer.h"
 #include "config.h"
+#include "utils.h"
 
 void play_startup_sound() {  
+  if (get_play_sounds() != "T") return;
+
   for (int i = 0; i < 5; i++) {
     tone(BUZZER_PIN, 150, 30); // Low
     delay(30);
@@ -26,6 +29,8 @@ void play_startup_sound() {
 }
 
 void play_config_sound() {
+    if (get_play_sounds() != "T") return;
+
     tone(BUZZER_PIN, 300, 100);
     delay(50);
     tone(BUZZER_PIN, 600, 50);
@@ -34,6 +39,8 @@ void play_config_sound() {
 }
 
 void play_ath_sound() {
+    if (get_play_sounds() != "T") return;
+
     tone(BUZZER_PIN, 523, 70); // C5 (Middle C)
     delay(70);
     

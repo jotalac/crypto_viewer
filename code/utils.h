@@ -29,5 +29,8 @@ void set_coin_names(String coin1, String coin2, String coin3);
 int get_current_coin_index();
 void set_current_coin_index(int index);
 
+void set_play_sounds(String val);
+String get_play_sounds();
+
 bool go_to_next_coin();
 int get_coin_count(); //how many coins are configured

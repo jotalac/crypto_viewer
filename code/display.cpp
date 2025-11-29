@@ -3,17 +3,12 @@
 #include "fonts/mono_bold_50.h"
 #include "fonts/mono_bold_60.h"
 #include "fonts/mono_medium.h"
-#include "background.h"
 #include "utils.h"
 
 TFT_eSPI tft = TFT_eSPI();
 
 void draw_gradient(uint16_t color) {
   tft.fillRectVGradient(0, 0, tft.width(), tft.height(), TFT_BLACK, color);
-}
-
-void print_background() {
-  tft.pushImage(0, 0, tft.width(), tft.height(), bg_img);
 }
 
 void draw_curreny_title(String currency_title) {

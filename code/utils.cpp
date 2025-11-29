@@ -32,13 +32,6 @@ std::string format_price(float number) {
             count++;
         }
         std::reverse(result.begin(), result.end());
-        
-        // Add decimal part -- not adding decimal part for big numbers
-        // int decimals = (int)((number - (int)number) * 100);
-        // if (decimals > 0) {
-        //     snprintf(buffer, sizeof(buffer), ".%02d", decimals);
-        //     result += buffer;
-        // }
         return result;
         
     } else if (number >= 1) {
@@ -132,16 +125,21 @@ bool setup_wifi_manager() {
     String saved_coin1 = preferences.getString("coin1", "bitcoin");  // default = "bitcoin"
     String saved_coin2 = preferences.getString("coin2", "");
     String saved_coin3 = preferences.getString("coin3", "");
+    String saved_play_sounds = preferences.getString("play_sounds", "T");
     preferences.end();
+
+    const char* checkbox_html = saved_play_sounds == "T" ? "type=\"checkbox\" checked" : "type=\"checkbox\"";
 
     //custom params for coin selection
     WiFiManagerParameter custom_coin1("coin1", "Coin 1 (bitcoin, ethereum, doge, ...)", saved_coin1.c_str(), 50);
     WiFiManagerParameter custom_coin2("coin2", "Coin 2 (bitcoin, ethereum, doge, ...)", saved_coin2.c_str(), 50);
     WiFiManagerParameter custom_coin3("coin3", "Coin 3 (bitcoin, ethereum, doge, ...)", saved_coin3.c_str(), 50);
+    WiFiManagerParameter play_sounds("playSound", "Play sounds", "T", 2, checkbox_html, WFM_LABEL_AFTER);
     wm.addParameter(&custom_coin1);
     wm.addParameter(&custom_coin2);
     wm.addParameter(&custom_coin3);
-    
+    wm.addParameter(&play_sounds);
+
     Serial.println("Starting WifiManager...");
     WiFi.mode(WIFI_STA);
 
@@ -162,14 +160,17 @@ bool setup_wifi_manager() {
         String new_coin1 = String(custom_coin1.getValue());
         String new_coin2 = String(custom_coin2.getValue());
         String new_coin3 = String(custom_coin3.getValue());
+        String new_play_sounds = String(play_sounds.getValue());
 
         set_coin_names(new_coin1, new_coin2, new_coin3);
+        set_play_sounds(new_play_sounds);
 
         // if (new_coin.isEmpty()) {Serial.println("Coin name empty"); return true;} //check if the coin is not empty
         Serial.println("Saved coins from portal:");
         Serial.println("  Coin 1: " + new_coin1);
         Serial.println("  Coin 2: " + new_coin2);
         Serial.println("  Coin 3: " + new_coin3);
+        Serial.println(new_play_sounds);
     } else {
         Serial.print("Skipped preference save. Current coins: ");
         Serial.println(saved_coin1 + ", " + saved_coin2 + ", " + saved_coin3);
@@ -212,61 +213,6 @@ bool wifi_connected() {
     return WiFi.status() == WL_CONNECTED;
 }
 
-// //check if button is hold for 3 seconds
-// bool check_config_button() {
-//     static unsigned long button_press_start = 0;
-//     static bool button_was_pressed = false;
-    
-//     bool button_pressed = (digitalRead(BUTTON_PIN) == LOW);
-    
-//     if (button_pressed && !button_was_pressed) {
-//         // Button just pressed
-//         button_press_start = millis();
-//         button_was_pressed = true;
-//     } 
-//     else if (!button_pressed && button_was_pressed) {
-//         // Button released
-//         button_was_pressed = false;
-//         button_press_start = 0;
-//     }
-//     else if (button_pressed && button_was_pressed) {
-//         // Button is being held
-//         unsigned long hold_time = millis() - button_press_start;
-//         if (hold_time >= CONFIG_PRESS_TIME) {
-//             button_was_pressed = false;
-//             button_press_start = 0;
-//             return true;  // Button held long enough
-//         }
-//     }
-    
-//     return false;
-// }
-
-// bool check_coin_change_button() {
-//     static unsigned long button_press_start = 0;
-//     static bool button_was_pressed = false;
-    
-//     bool button_pressed = (digitalRead(BUTTON_PIN) == LOW);
-    
-//     if (button_pressed && !button_was_pressed) {
-//         button_press_start = millis();
-//         button_was_pressed = true;
-//     } 
-//     else if (!button_pressed && button_was_pressed) {
-//         // Button released - check duration
-//         unsigned long hold_time = millis() - button_press_start;
-//         button_was_pressed = false;
-//         button_press_start = 0;
-        
-//         // Short press (less than config time)
-//         if (hold_time >= BUTTON_SHORT_PRESS_TIME && hold_time < CONFIG_PRESS_TIME) {
-//             return true;
-//         }
-//     }
-    
-//     return false;
-// }
-
 // Start configuration portal on demand
 bool start_config_portal_on_demand() {
     Serial.println("Starting configuration portal on demand...");
@@ -282,15 +228,21 @@ bool start_config_portal_on_demand() {
     String current_coin1 = preferences.getString("coin1", "bitcoin");
     String current_coin2 = preferences.getString("coin2", "");
     String current_coin3 = preferences.getString("coin3", "");
+    String saved_play_sounds = preferences.getString("play_sounds", "T");
     preferences.end();
+
+    const char* checkbox_html = saved_play_sounds == "T" ? "type=\"checkbox\" checked" : "type=\"checkbox\"";
     
     WiFiManagerParameter custom_coin1("coin1", "Coin 1 (bitcoin, ethereum, doge, ...)", current_coin1.c_str(), 50);
     WiFiManagerParameter custom_coin2("coin2", "Coin 2 (optional)", current_coin2.c_str(), 50);
     WiFiManagerParameter custom_coin3("coin3", "Coin 3 (optional)", current_coin3.c_str(), 50);
+    WiFiManagerParameter play_sounds("playSound", "Play sounds", "T", 2, checkbox_html, WFM_LABEL_AFTER);
+
     
     wm.addParameter(&custom_coin1);
     wm.addParameter(&custom_coin2);
     wm.addParameter(&custom_coin3);
+    wm.addParameter(&play_sounds);
 
     // Track if config was saved
     bool config_saved = false;
@@ -306,13 +258,16 @@ bool start_config_portal_on_demand() {
     String new_coin1 = String(custom_coin1.getValue());
     String new_coin2 = String(custom_coin2.getValue());
     String new_coin3 = String(custom_coin3.getValue());
+    String new_play_sounds = String(play_sounds.getValue());
     
     if (!new_coin1.isEmpty()) {
         set_coin_names(new_coin1, new_coin2, new_coin3);
+        set_play_sounds(new_play_sounds);
         Serial.println("Coins saved:");
         Serial.println("  " + new_coin1);
         Serial.println("  " + new_coin2);
         Serial.println("  " + new_coin3);
+        Serial.println(String(play_sounds.getValue()));
     }
     
     if (success || config_saved) {
@@ -354,6 +309,20 @@ void set_current_coin_index(int index) {
     preferences.begin("crypto", false);
     preferences.putInt("current_index", index);
     preferences.end();
+}
+
+void set_play_sounds(String val) {
+    preferences.begin("crypto", false);
+    preferences.putString("play_sounds", val);
+    preferences.end();
+}
+
+String get_play_sounds() {
+    preferences.begin("crypto", true);
+    String val = preferences.getString("play_sounds", "T");
+    preferences.end();
+
+    return val;
 }
 
 // Cycle to next coin

@@ -6,8 +6,6 @@ extern TFT_eSPI tft;
 
 void draw_gradient(uint16_t color);
 
-void print_background();
-
 void draw_curreny_title(String currency_title);
 
 void draw_price(float price);
