@@ -177,7 +177,7 @@ void draw_graph(GraphData graph_data, bool is_growing) {
   int graphX = 0; 
   int graphY = 50; 
   int graphW = 320; 
-  int graphH = 240 - graphY;
+  int graphH = 240 - graphY - 20;
   int bottomY = graphY + graphH;
 
   uint16_t LINE_COLOR = is_growing ? GRAPH_LINE_GREEN : GRAPH_LINE_RED;

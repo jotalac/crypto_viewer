@@ -8,7 +8,7 @@
 #define DARK_BLUE 0x11b3
 #define LIGHT_GRAY 0xce79
 
-#define GRAPH_FILL_RED 0x3841
+#define GRAPH_FILL_RED 0x5061
 #define GRAPH_LINE_RED 0xc1c3
 
 #define GRAPH_FILL_GREEN 0x00c0

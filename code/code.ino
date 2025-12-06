@@ -67,10 +67,10 @@ void loop() {
     CoinData fetched_data = fetch_coin_data();
 
     //check if we need to fetch new grapth (every 1 hour)
-    int graph_last_fetch_time = all_graph_data[current_coin_index].last_fetch; 
-    GraphData graph_data = {0, 0, 0, 0, 0};
-    if (current_time - graph_last_fetch_time >= FETCH_GRAPH_INTERVAL || graph_last_fetch_time == 0) {
+    GraphData graph_data = all_graph_data[current_coin_index]; 
+    if (current_time - graph_data.last_fetch >= FETCH_GRAPH_INTERVAL || graph_data.last_fetch == 0) {
       graph_data = fetch_graph_data();
+      all_graph_data[current_coin_index] = graph_data;
     }
 
     if (fetched_data.price != -1) {
@@ -79,7 +79,6 @@ void loop() {
       last_fetch_time = current_time;
       //update the saved vlaues
       all_coins_data[current_coin_index] = fetched_data;
-      all_graph_data[current_coin_index] = graph_data;
       //play sound if the current price is ath
       if (fetched_data.ath_percentage >= 0) play_ath_sound();
     } else {
