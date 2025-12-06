@@ -116,11 +116,12 @@ void draw_ath_data(float ath_price, float ath_change) {
 }
 
 
-void render_price(CoinData &fetchedData, const String time_frame) {
+void render_price(const CoinData &fetchedData, const GraphData &graph_data, const String time_frame) {
   
   // print_background(); // prints image
   uint16_t color = fetchedData.price_change_percentage >= 0 ? DARK_YELLOW : TFT_RED;
   draw_gradient(color);
+  draw_graph(graph_data, fetchedData.price_change_percentage >= 0);
 
   draw_curreny_title(String(fetchedData.symbol.c_str()));
   draw_price(fetchedData.price);
@@ -163,4 +164,47 @@ void display_wifi_setup_message(String message) {
   tft.drawString("crypto123", 40, 180);
   
   tft.unloadFont();
+}
+
+
+void draw_graph(GraphData graph_data, bool is_growing) {
+  if (graph_data.data_count < 2) {
+    Serial.println("No grapth data to display");
+    return; 
+  }
+
+  // Layout Settings
+  int graphX = 0; 
+  int graphY = 50; 
+  int graphW = 320; 
+  int graphH = 240 - graphY;
+  int bottomY = graphY + graphH;
+
+  uint16_t LINE_COLOR = is_growing ? GRAPH_LINE_GREEN : GRAPH_LINE_RED;
+  uint16_t FILL_COLOR = is_growing ? GRAPH_FILL_GREEN : GRAPH_FILL_RED;
+
+  float xSpacing = (float)graphW / (graph_data.data_count - 1);
+
+  for (int i = 0; i < graph_data.data_count - 1; i++) {
+    int x1 = graphX + (i * xSpacing);
+    int x2 = graphX + ((i + 1) * xSpacing);
+    
+    float range = (graph_data.max_price - graph_data.min_price);
+    if (range == 0) range = 1; 
+
+    // Calculate Y positions
+    int y1 = bottomY - ((graph_data.price_history[i] - graph_data.min_price) / range) * graphH;
+    int y2 = bottomY - ((graph_data.price_history[i+1] - graph_data.min_price) / range) * graphH;
+
+    // We draw two triangles to fill the trapezoid shape under the line
+    // Triangle 1: Top-Left, Top-Right, Bottom-Left
+    tft.fillTriangle(x1, y1, x2, y2, x1, tft.height(), FILL_COLOR);
+    // Triangle 2: Bottom-Left, Top-Right, Bottom-Right
+    tft.fillTriangle(x1, tft.height(), x2, y2, x2, tft.height(), FILL_COLOR);
+
+    // Draw the main line
+    tft.drawWideLine(x1, y1 , x2, y2, 5, LINE_COLOR, TFT_BLACK);
+    // tft.drawLine(x1, y1, x2, y2, LINE_COLOR);
+    
+  }
 }

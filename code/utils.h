@@ -8,6 +8,13 @@
 #define DARK_BLUE 0x11b3
 #define LIGHT_GRAY 0xce79
 
+#define GRAPH_FILL_RED 0x3841
+#define GRAPH_LINE_RED 0xc1c3
+
+#define GRAPH_FILL_GREEN 0x00c0
+#define GRAPH_LINE_GREEN 0x0d23
+
+
 std::string format_price(float number);
 std::string format_price_change(float price_change, int precision);
 

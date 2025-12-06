@@ -7,7 +7,9 @@
 
 unsigned long last_fetch_time = 0;
 const unsigned long FETCH_INTERVAL = 1000 * 60 * 10;  // 10 minutes
+const unsigned long FETCH_GRAPH_INTERVAL = 1000 * 60 * 60;  // 1 hour
 CoinData all_coins_data[3] = {{}, {}, {}};
+GraphData all_graph_data[3] = {{}, {}, {}};
 
 
 void setup() {
@@ -59,22 +61,33 @@ void loop() {
       ESP.restart();
     };
 
+    int current_coin_index = get_current_coin_index();
+
+    //fetch coin data
     CoinData fetched_data = fetch_coin_data();
-    float price = fetched_data.price;
-    
-    if (price != -1) {
+
+    //check if we need to fetch new grapth (every 1 hour)
+    int graph_last_fetch_time = all_graph_data[current_coin_index].last_fetch; 
+    GraphData graph_data = {0, 0, 0, 0, 0};
+    if (current_time - graph_last_fetch_time >= FETCH_GRAPH_INTERVAL || graph_last_fetch_time == 0) {
+      graph_data = fetch_graph_data();
+    }
+
+    if (fetched_data.price != -1) {
       //display new data
-      render_price(fetched_data, "*24h");
+      render_price(fetched_data, graph_data, "*24h");
       last_fetch_time = current_time;
       //update the saved vlaues
-      all_coins_data[get_current_coin_index()] = fetched_data; 
+      all_coins_data[current_coin_index] = fetched_data;
+      all_graph_data[current_coin_index] = graph_data;
       //play sound if the current price is ath
       if (fetched_data.ath_percentage >= 0) play_ath_sound();
     } else {
-      display_message("Error fetching price for: " + get_coin_name());
+      display_message("Fetch error for: " + get_coin_name());
       // Retry in 30 seconds instead of 10 minutes on error
       last_fetch_time = current_time - FETCH_INTERVAL + 30000;
     }
+
   }
 
   delay(100);
@@ -95,7 +108,7 @@ void check_btn_1_press() {
         if (all_coins_data[current_index].symbol.empty()) {
           last_fetch_time = 0;
         } else {
-          render_price(all_coins_data[current_index], "*24h");
+          render_price(all_coins_data[current_index], all_graph_data[current_index], "*24h");
         }
       }
   }
