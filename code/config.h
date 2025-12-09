@@ -1,5 +1,21 @@
-#include <string>
+#ifndef CONFIG_H
+#define CONFIG_H
+
 #include <Arduino.h>
+#include <WiFi.h>
+#include <WebServer.h>
+#include <WiFiManager.h>
+#include <HTTPClient.h>
+#include <ArduinoJson.h>
+#include <Preferences.h>
+#include <TFT_eSPI.h>
+#include <vector>
+#include <string>
+#include <cstdio>
+
+// extern variables
+extern Preferences preferences; 
+extern TFT_eSPI tft;
 
 // button
 #define PORTAL_TIMEOUT 120 // 2 minutes wait in wifi config mode
@@ -14,3 +30,5 @@
 
 //coin cycling
 #define MAX_COINS 3
+
+#endif

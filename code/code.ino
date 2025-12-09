@@ -1,7 +1,8 @@
+#include "config.h"
+#include "wifi_config.h"
+#include "network.h"
 #include "display.h"
 #include "utils.h"
-#include "network.h"
-#include "config.h"
 #include "buzzer.h"
 #include "button_control.h"
 
@@ -68,14 +69,14 @@ void loop() {
 
     //check if we need to fetch new grapth (every 1 hour)
     GraphData graph_data = all_graph_data[current_coin_index]; 
-    if (current_time - graph_data.last_fetch >= FETCH_GRAPH_INTERVAL || graph_data.last_fetch == 0) {
+    if ((current_time - graph_data.last_fetch >= FETCH_GRAPH_INTERVAL || graph_data.last_fetch == 0) && should_display_graph()) {
       graph_data = fetch_graph_data();
       all_graph_data[current_coin_index] = graph_data;
     }
 
     if (fetched_data.price != -1) {
       //display new data
-      render_price(fetched_data, graph_data, "*24h");
+      render_screen(fetched_data, graph_data, "*24h");
       last_fetch_time = current_time;
       //update the saved vlaues
       all_coins_data[current_coin_index] = fetched_data;
@@ -107,7 +108,7 @@ void check_btn_1_press() {
         if (all_coins_data[current_index].symbol.empty()) {
           last_fetch_time = 0;
         } else {
-          render_price(all_coins_data[current_index], all_graph_data[current_index], "*24h");
+          render_screen(all_coins_data[current_index], all_graph_data[current_index], "*24h");
         }
       }
   }

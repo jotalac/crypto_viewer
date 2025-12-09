@@ -19,7 +19,7 @@ void draw_curreny_title(String currency_title) {
   tft.unloadFont();
 }
 
-void draw_price(float price) {
+void draw_price(float price, bool centered) {
   std::string tempPriceString;  
   if (price == 0) {
     tempPriceString = "$ ...";
@@ -42,10 +42,11 @@ void draw_price(float price) {
     }
   }
   
+  int y_location = centered ? tft.height() / 2 : 70;
 
   tft.setTextDatum(MC_DATUM);
   tft.setTextColor(TFT_WHITE, TFT_TRANSPARENT);
-  tft.drawString(priceDisplay, tft.width() / 2, 70);
+  tft.drawString(priceDisplay, tft.width() / 2, y_location);
   tft.unloadFont();
 
   tft.setTextDatum(TL_DATUM);
@@ -116,17 +117,26 @@ void draw_ath_data(float ath_price, float ath_change) {
 }
 
 
-void render_price(const CoinData &fetchedData, const GraphData &graph_data, const String time_frame) {
+void render_screen(const CoinData &fetchedData, const GraphData &graph_data, const String time_frame) {
   
   // print_background(); // prints image
-  uint16_t color = fetchedData.price_change_percentage >= 0 ? DARK_YELLOW : TFT_RED;
-  draw_gradient(color);
-  draw_graph(graph_data, fetchedData.price_change_percentage >= 0);
+  uint16_t bg_color = fetchedData.price_change_percentage >= 0 ? DARK_YELLOW : TFT_RED;
+  draw_gradient(bg_color);
+  
+  //display graph if selected
+  if (should_display_graph()) {draw_graph(graph_data, fetchedData.price_change_percentage >= 0);}
 
   draw_curreny_title(String(fetchedData.symbol.c_str()));
-  draw_price(fetchedData.price);
-  draw_price_change(fetchedData.price_change_percentage, time_frame);
-  draw_ath_data(fetchedData.ath_price, fetchedData.ath_percentage);
+  
+  if (is_simple_layout()) {
+    draw_price(fetchedData.price, true);
+  } else {
+    draw_price(fetchedData.price, false);
+    draw_price_change(fetchedData.price_change_percentage, time_frame);
+    draw_ath_data(fetchedData.ath_price, fetchedData.ath_percentage);
+
+  }
+
 }
 
 

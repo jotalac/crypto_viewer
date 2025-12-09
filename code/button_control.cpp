@@ -1,5 +1,5 @@
-#include "button_control.h"
 #include "config.h"
+#include "button_control.h"
 
 //check if button is hold for 3 seconds
 bool check_config_button() {

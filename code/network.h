@@ -1,9 +1,6 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
-#include <vector>
-#include <string>
-
 #define GRAPH_POINTS 30
 #define DOWNSAMPLE_GRAPH 10 //285 / 50
 
