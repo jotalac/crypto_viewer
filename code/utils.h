@@ -7,6 +7,7 @@
 #define DARK_PURPLE 0x80b3
 #define DARK_BLUE 0x11b3
 #define LIGHT_GRAY 0xce79
+#define BRIGHT_ORANGE 0xcd03
 
 #define GRAPH_FILL_RED 0x5061
 #define GRAPH_LINE_RED 0xc1c3
@@ -20,7 +21,7 @@ std::string format_price_change(float price_change, int precision);
 
 void turn_on_external_antenna();
 
-bool setup_time();
+void setup_time();
 
 
 String get_coin_name();
@@ -36,7 +37,7 @@ bool is_simple_layout();
 bool should_display_graph();
 
 String get_timezone();
-// void set_timezone(String val);
+void set_timezone(String val);
 
 bool go_to_next_screen();
 int get_screen_count(); //how many coins are configured

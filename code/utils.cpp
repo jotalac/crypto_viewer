@@ -96,17 +96,21 @@ void setup_wifi(const char* ssid, const char* password) {
   Serial.println(WiFi.localIP());
 }
 
-bool setup_time() {
+void setup_time() {
     Serial.println("Waiting for time sync...");
-    waitForSync(); // freezes here until time is received
+    waitForSync(30); // freezes here until time is received
     Serial.println("Time synced!");
 
-    myTZ.setLocation(get_timezone());
+    Serial.println("Timezone is:" + get_timezone());
+
+    if(!myTZ.setLocation(get_timezone())) {
+        set_timezone("Invalid timezone");
+    };
 }
 
 String get_timezone() {
     preferences.begin("crypto", true);
-    String tz = preferences.getString("timezone", "");
+    String tz = preferences.getString("timezone", "Europe/London");
     preferences.end();
     return tz;
 }
@@ -116,6 +120,13 @@ String get_coin_name() {
     int index = get_current_screen_index();
     return get_coin_name(index);
 }
+
+void set_timezone(String val) {
+    preferences.begin("crypto", false);
+    preferences.putString("timezone", val);
+    preferences.end();
+}
+
 
 String get_coin_name(int index) {
     preferences.begin("crypto", true);

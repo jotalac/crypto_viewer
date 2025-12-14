@@ -41,9 +41,10 @@ void setup() {
     ESP.restart();
   }
 
+  display_message("Getting current time...");
   setup_time();
 }
-
+ 
 void loop() {  
   //check all button presses
   check_btn_1_press();
@@ -55,45 +56,51 @@ void loop() {
   //update time;
   events();
 
-  //check if we should fetch new data
-  if (cur_screen_i == total_screens-1) return;
-  unsigned long current_time = millis();
-  if (current_time - last_fetch_time >= FETCH_INTERVAL || last_fetch_time == 0) {
-    Serial.println("Fetching new price...");
+  int current_index = get_current_screen_index();
 
-    //check if wifi is connected
-    if (!check_wifi_connection()) {
-      display_message("Wifi reconnect failed, Restarting...");
-      delay(2000);
-      ESP.restart();
-    };
-
-    int current_coin_index = get_current_screen_index();
-
-    //fetch coin data
-    CoinData fetched_data = fetch_coin_data();
-
-    //check if we need to fetch new grapth (every 1 hour)
-    GraphData graph_data = all_graph_data[current_coin_index]; 
-    if ((current_time - graph_data.last_fetch >= FETCH_GRAPH_INTERVAL || graph_data.last_fetch == 0) && should_display_graph()) {
-      graph_data = fetch_graph_data();
-      all_graph_data[current_coin_index] = graph_data;
+  if (current_index >= total_screens - 1) {
+    render_screen_clock();
+  }
+  else {
+    //check if we should fetch new data
+    if (cur_screen_i == total_screens-1) return;
+    unsigned long current_time = millis();
+    if (current_time - last_fetch_time >= FETCH_INTERVAL || last_fetch_time == 0) {
+      Serial.println("Fetching new price...");
+  
+      //check if wifi is connected
+      if (!check_wifi_connection()) {
+        display_message("Wifi reconnect failed, Restarting...");
+        delay(2000);
+        ESP.restart();
+      };
+  
+      int current_coin_index = get_current_screen_index();
+  
+      //fetch coin data
+      CoinData fetched_data = fetch_coin_data();
+  
+      //check if we need to fetch new grapth (every 1 hour)
+      GraphData graph_data = all_graph_data[current_coin_index]; 
+      if ((current_time - graph_data.last_fetch >= FETCH_GRAPH_INTERVAL || graph_data.last_fetch == 0) && should_display_graph()) {
+        graph_data = fetch_graph_data();
+        all_graph_data[current_coin_index] = graph_data;
+      }
+  
+      if (fetched_data.price != -1) {
+        //display new data
+        render_screen(fetched_data, graph_data, "*24h");
+        last_fetch_time = current_time;
+        //update the saved vlaues
+        all_coins_data[current_coin_index] = fetched_data;
+        //play sound if the current price is ath
+        if (fetched_data.ath_percentage >= 0) play_ath_sound();
+      } else {
+        display_message("Fetch error for: " + get_coin_name());
+        // Retry in 30 seconds instead of 10 minutes on error
+        last_fetch_time = current_time - FETCH_INTERVAL + 30000;
+      }
     }
-
-    if (fetched_data.price != -1) {
-      //display new data
-      render_screen(fetched_data, graph_data, "*24h");
-      last_fetch_time = current_time;
-      //update the saved vlaues
-      all_coins_data[current_coin_index] = fetched_data;
-      //play sound if the current price is ath
-      if (fetched_data.ath_percentage >= 0) play_ath_sound();
-    } else {
-      display_message("Fetch error for: " + get_coin_name());
-      // Retry in 30 seconds instead of 10 minutes on error
-      last_fetch_time = current_time - FETCH_INTERVAL + 30000;
-    }
-
   }
 
   delay(100);
@@ -103,23 +110,33 @@ void check_btn_1_press() {
   if (check_screen_change_button()) {    
       //try to go to next coin if only one coin is setup dont do anything
       if (go_to_next_screen()) {
-        ++cur_screen_i;
         Serial.println("Cycling to next screen");  
-        // Show indicator
+        
         int current_index = get_current_screen_index();
-        String coin_name = get_coin_name();
-        display_message("Switching to: " + coin_name);
+        
+        // Determine name for display
+        String name_to_show;
+        if (current_index >= total_screens - 1) {
+            name_to_show = "Time";
+        } else {
+            name_to_show = get_coin_name();
+        }
+
+        display_message("Switching to: " + name_to_show);
         delay(500);
         
-        if (current_index == total_screens) {
+        if (current_index >= total_screens - 1) {
           //display time
           render_screen_clock();
         }
-        // Force immediate fetch
-        else if (all_coins_data[current_index].symbol.empty()) {
-          last_fetch_time = 0;
-        } else {
-          render_screen(all_coins_data[current_index], all_graph_data[current_index], "*24h");
+        // Force immediate fetch for coins
+        else {
+           // If we have no data yet, force fetch
+           if (all_coins_data[current_index].symbol.empty()) {
+             last_fetch_time = 0;
+           } else {
+             render_screen(all_coins_data[current_index], all_graph_data[current_index], "*24h");
+           }
         }
       }
   }

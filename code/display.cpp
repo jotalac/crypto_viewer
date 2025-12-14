@@ -140,20 +140,30 @@ void render_screen(const CoinData &fetchedData, const GraphData &graph_data, con
 }
 
 void render_screen_clock() {
-  draw_gradient(DARK_YELLOW);
+  static String last_time = "";
+  String current_time = myTZ.dateTime("H:i");
 
-  tft.loadFont(mono_bold_50);
-  // tft.loadFont(mono_bold_60);
+  if (last_time == current_time) return;
   
+  //draw background
+  draw_gradient(DARK_BLUE);
   tft.setTextDatum(MC_DATUM);
-  tft.setTextColor(TFT_WHITE, TFT_TRANSPARENT);
-  tft.drawString(myTZ.dateTime("H:i:s"), tft.width() / 2, tft.height() / 2);
+  
+  //draw timezone info
+  tft.loadFont(mono_small);
+  tft.setTextColor(LIGHT_GRAY, TFT_TRANSPARENT);
+  tft.drawString(get_timezone(), tft.width() / 2, 50);
   tft.unloadFont();
+  
+  // draw the time 
+  tft.loadFont(mono_bold_60);
+  tft.setTextColor(TFT_WHITE, TFT_TRANSPARENT);
+  tft.drawString(current_time, tft.width() / 2, tft.height() / 2);
+  tft.unloadFont();
+  tft.setTextDatum(TL_DATUM);  
+  last_time = current_time;
 
-  tft.setTextDatum(TL_DATUM);
 }
-
-
 
 void display_message(String message) {
   // tft.fillRect(0, 0, tft.width(), tft.height(), TFT_BLACK);

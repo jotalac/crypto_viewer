@@ -11,7 +11,7 @@ ConfigParams load_config() {
     config.coin1 = preferences.getString("coin1", "bitcoin");
     config.coin2 = preferences.getString("coin2", "");
     config.coin3 = preferences.getString("coin3", "");
-    config.timezone = preferences.getString("timezone", "0");
+    config.timezone = preferences.getString("timezone", "Europe/London");
     config.play_sounds = preferences.getString("play_sounds", "T");
     config.simple_layout = preferences.getString("simple_layout", "");
     config.display_graph = preferences.getString("display_graph", "T");
@@ -60,7 +60,7 @@ void setup_wm_parameters(WiFiManager& wm, const ConfigParams& config,
     new (&coin1_param) WiFiManagerParameter("coin1", "Coin 1 (bitcoin, ethereum, doge, ...)", config.coin1.c_str(), 50);
     new (&coin2_param) WiFiManagerParameter("coin2", "Coin 2 (optional)", config.coin2.c_str(), 50);
     new (&coin3_param) WiFiManagerParameter("coin3", "Coin 3 (optional)", config.coin3.c_str(), 50);
-    new (&timezone_param) WiFiManagerParameter("timezone", "Continent/City (Europe/Berlin, America/New_York)", config.timezone.c_str(), 50);
+    new (&timezone_param) WiFiManagerParameter("timezone", "Timezone: 'Continent/City' (eg. America/New_York, ...)", config.timezone.c_str(), 50);
     new (&sounds_param) WiFiManagerParameter("playSound", "Play sounds", "T", 2, checkbox_sounds, WFM_LABEL_AFTER);
     new (&simple_param) WiFiManagerParameter("simpleLayout", "Simple layout", "T", 2, checkbox_simple, WFM_LABEL_AFTER);
     new (&graph_param) WiFiManagerParameter("displayGraph", "Display graph", "T", 2, checkbox_graph, WFM_LABEL_AFTER);
