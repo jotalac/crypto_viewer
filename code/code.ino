@@ -11,6 +11,8 @@ const unsigned long FETCH_INTERVAL = 1000 * 60 * 10;  // 10 minutes
 const unsigned long FETCH_GRAPH_INTERVAL = 1000 * 60 * 60;  // 1 hour
 CoinData all_coins_data[3] = {{}, {}, {}};
 GraphData all_graph_data[3] = {{}, {}, {}};
+int cur_screen_i = 0;
+int total_screens = get_screen_count();
 
 
 void setup() {
@@ -39,7 +41,7 @@ void setup() {
     ESP.restart();
   }
 
-  // last_fetch_time = 0;
+  setup_time();
 }
 
 void loop() {  
@@ -50,7 +52,11 @@ void loop() {
   check_btn2_press();
   check_btn2_hold();
 
+  //update time;
+  events();
+
   //check if we should fetch new data
+  if (cur_screen_i == total_screens-1) return;
   unsigned long current_time = millis();
   if (current_time - last_fetch_time >= FETCH_INTERVAL || last_fetch_time == 0) {
     Serial.println("Fetching new price...");
@@ -62,7 +68,7 @@ void loop() {
       ESP.restart();
     };
 
-    int current_coin_index = get_current_coin_index();
+    int current_coin_index = get_current_screen_index();
 
     //fetch coin data
     CoinData fetched_data = fetch_coin_data();
@@ -94,18 +100,23 @@ void loop() {
 }
 
 void check_btn_1_press() {
-  if (check_coin_change_button()) {    
+  if (check_screen_change_button()) {    
       //try to go to next coin if only one coin is setup dont do anything
-      if (go_to_next_coin()) {
-        Serial.println("Cycling to next coin");  
+      if (go_to_next_screen()) {
+        ++cur_screen_i;
+        Serial.println("Cycling to next screen");  
         // Show indicator
-        int current_index = get_current_coin_index();
+        int current_index = get_current_screen_index();
         String coin_name = get_coin_name();
         display_message("Switching to: " + coin_name);
         delay(500);
         
+        if (current_index == total_screens) {
+          //display time
+          render_screen_clock();
+        }
         // Force immediate fetch
-        if (all_coins_data[current_index].symbol.empty()) {
+        else if (all_coins_data[current_index].symbol.empty()) {
           last_fetch_time = 0;
         } else {
           render_screen(all_coins_data[current_index], all_graph_data[current_index], "*24h");

@@ -139,6 +139,21 @@ void render_screen(const CoinData &fetchedData, const GraphData &graph_data, con
 
 }
 
+void render_screen_clock() {
+  draw_gradient(DARK_YELLOW);
+
+  tft.loadFont(mono_bold_50);
+  // tft.loadFont(mono_bold_60);
+  
+  tft.setTextDatum(MC_DATUM);
+  tft.setTextColor(TFT_WHITE, TFT_TRANSPARENT);
+  tft.drawString(myTZ.dateTime("H:i:s"), tft.width() / 2, tft.height() / 2);
+  tft.unloadFont();
+
+  tft.setTextDatum(TL_DATUM);
+}
+
+
 
 void display_message(String message) {
   // tft.fillRect(0, 0, tft.width(), tft.height(), TFT_BLACK);

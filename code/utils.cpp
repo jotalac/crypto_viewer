@@ -3,6 +3,7 @@
 #include "display.h"
 
 Preferences preferences;
+Timezone myTZ;
 
 std::string format_price(float number) {
     if (number == 0) {
@@ -95,9 +96,24 @@ void setup_wifi(const char* ssid, const char* password) {
   Serial.println(WiFi.localIP());
 }
 
+bool setup_time() {
+    Serial.println("Waiting for time sync...");
+    waitForSync(); // freezes here until time is received
+    Serial.println("Time synced!");
+
+    myTZ.setLocation(get_timezone());
+}
+
+String get_timezone() {
+    preferences.begin("crypto", true);
+    String tz = preferences.getString("timezone", "");
+    preferences.end();
+    return tz;
+}
+
 
 String get_coin_name() {
-    int index = get_current_coin_index();
+    int index = get_current_screen_index();
     return get_coin_name(index);
 }
 
@@ -117,14 +133,14 @@ void set_coin_names(String coin1, String coin2, String coin3) {
     preferences.end();
 }
 
-int get_current_coin_index() {
+int get_current_screen_index() {
     preferences.begin("crypto", false);
     int index = preferences.getInt("current_index", 0);
     preferences.end();
     return index;
 }
 
-void set_current_coin_index(int index) {
+void set_current_screen_index(int index) {
     preferences.begin("crypto", false);
     preferences.putInt("current_index", index);
     preferences.end();
@@ -161,14 +177,14 @@ bool should_display_graph() {
 }
 
 // Cycle to next coin
-bool go_to_next_coin() {
-    int total = get_coin_count();
+bool go_to_next_screen() {
+    int total = get_screen_count();
     if (total <= 1) return false;  // Nothing to cycle
     
-    int current = get_current_coin_index();
+    int current = get_current_screen_index();
     int next = (current + 1) % total;
     
-    set_current_coin_index(next);
+    set_current_screen_index(next);
     
     Serial.print("Cycled from coin ");
     Serial.print(current);
@@ -179,14 +195,14 @@ bool go_to_next_coin() {
 }
 
 // Get total number of configured coins
-int get_coin_count() {
+int get_screen_count() {
     preferences.begin("crypto", true);
     String coin1 = preferences.getString("coin1", "bitcoin");
     String coin2 = preferences.getString("coin2", "");
     String coin3 = preferences.getString("coin3", "");
     preferences.end();
     
-    int count = 0;
+    int count = 1; // for the time screen
     if (!coin1.isEmpty()) count++;
     if (!coin2.isEmpty()) count++;
     if (!coin3.isEmpty()) count++;

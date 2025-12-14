@@ -11,6 +11,7 @@ ConfigParams load_config() {
     config.coin1 = preferences.getString("coin1", "bitcoin");
     config.coin2 = preferences.getString("coin2", "");
     config.coin3 = preferences.getString("coin3", "");
+    config.timezone = preferences.getString("timezone", "0");
     config.play_sounds = preferences.getString("play_sounds", "T");
     config.simple_layout = preferences.getString("simple_layout", "");
     config.display_graph = preferences.getString("display_graph", "T");
@@ -23,6 +24,7 @@ void save_config(const ConfigParams& config) {
     preferences.putString("coin1", config.coin1);
     preferences.putString("coin2", config.coin2);
     preferences.putString("coin3", config.coin3);
+    preferences.putString("timezone", config.timezone);
     preferences.putString("play_sounds", config.play_sounds);
     preferences.putString("simple_layout", config.simple_layout);
     preferences.putString("display_graph", config.display_graph);
@@ -32,6 +34,7 @@ void save_config(const ConfigParams& config) {
     Serial.println("  Coin 1: " + config.coin1);
     Serial.println("  Coin 2: " + config.coin2);
     Serial.println("  Coin 3: " + config.coin3);
+    Serial.println("  Time zone: " + config.timezone);
     Serial.println("  Play sounds: " + config.play_sounds);
     Serial.println("  Simple display: " + config.simple_layout);
     Serial.println("  Display graph: " + config.display_graph);
@@ -41,6 +44,7 @@ void setup_wm_parameters(WiFiManager& wm, const ConfigParams& config,
                         WiFiManagerParameter& coin1_param,
                         WiFiManagerParameter& coin2_param,
                         WiFiManagerParameter& coin3_param,
+                        WiFiManagerParameter& timezone_param,
                         WiFiManagerParameter& sounds_param,
                         WiFiManagerParameter& simple_param,
                         WiFiManagerParameter& graph_param) 
@@ -56,6 +60,7 @@ void setup_wm_parameters(WiFiManager& wm, const ConfigParams& config,
     new (&coin1_param) WiFiManagerParameter("coin1", "Coin 1 (bitcoin, ethereum, doge, ...)", config.coin1.c_str(), 50);
     new (&coin2_param) WiFiManagerParameter("coin2", "Coin 2 (optional)", config.coin2.c_str(), 50);
     new (&coin3_param) WiFiManagerParameter("coin3", "Coin 3 (optional)", config.coin3.c_str(), 50);
+    new (&timezone_param) WiFiManagerParameter("timezone", "Continent/City (Europe/Berlin, America/New_York)", config.timezone.c_str(), 50);
     new (&sounds_param) WiFiManagerParameter("playSound", "Play sounds", "T", 2, checkbox_sounds, WFM_LABEL_AFTER);
     new (&simple_param) WiFiManagerParameter("simpleLayout", "Simple layout", "T", 2, checkbox_simple, WFM_LABEL_AFTER);
     new (&graph_param) WiFiManagerParameter("displayGraph", "Display graph", "T", 2, checkbox_graph, WFM_LABEL_AFTER);
@@ -64,6 +69,7 @@ void setup_wm_parameters(WiFiManager& wm, const ConfigParams& config,
     wm.addParameter(&coin1_param);
     wm.addParameter(&coin2_param);
     wm.addParameter(&coin3_param);
+    wm.addParameter(&timezone_param);
     wm.addParameter(&sounds_param);
     wm.addParameter(&simple_param);
     wm.addParameter(&graph_param);
@@ -72,6 +78,7 @@ void setup_wm_parameters(WiFiManager& wm, const ConfigParams& config,
 ConfigParams get_wm_values(WiFiManagerParameter& coin1_param,
                            WiFiManagerParameter& coin2_param,
                            WiFiManagerParameter& coin3_param,
+                           WiFiManagerParameter& timezone_param,
                            WiFiManagerParameter& sounds_param,
                            WiFiManagerParameter& simple_param,
                            WiFiManagerParameter& graph_param) {
@@ -79,6 +86,7 @@ ConfigParams get_wm_values(WiFiManagerParameter& coin1_param,
     config.coin1 = String(coin1_param.getValue());
     config.coin2 = String(coin2_param.getValue());
     config.coin3 = String(coin3_param.getValue());
+    config.timezone = String(timezone_param.getValue());
     config.play_sounds = String(sounds_param.getValue());
     config.simple_layout = String(simple_param.getValue());
     config.display_graph = String(graph_param.getValue());
@@ -107,9 +115,9 @@ bool setup_wifi_manager() {
     
     // Setup parameters
     WiFiManagerParameter coin1_param, coin2_param, coin3_param;
-    WiFiManagerParameter sounds_param, simple_param, graph_param;
+    WiFiManagerParameter timezone_param, sounds_param, simple_param, graph_param;
     
-    setup_wm_parameters(wm, config, coin1_param, coin2_param, coin3_param, 
+    setup_wm_parameters(wm, config, coin1_param, coin2_param, coin3_param, timezone_param,
                        sounds_param, simple_param, graph_param);
 
     Serial.println("Starting WifiManager...");
@@ -126,7 +134,7 @@ bool setup_wifi_manager() {
 
     // Save new config if params were changed
     if (params_saved) {
-        ConfigParams new_config = get_wm_values(coin1_param, coin2_param, coin3_param,
+        ConfigParams new_config = get_wm_values(coin1_param, coin2_param, coin3_param, timezone_param,
                                                 sounds_param, simple_param, graph_param);
         save_config(new_config);
     } else {
@@ -155,16 +163,16 @@ bool start_config_portal_on_demand() {
     
     // Setup parameters
     WiFiManagerParameter coin1_param, coin2_param, coin3_param;
-    WiFiManagerParameter sounds_param, simple_param, graph_param;
+    WiFiManagerParameter timezone_param, sounds_param, simple_param, graph_param;
     
-    setup_wm_parameters(wm, config, coin1_param, coin2_param, coin3_param,
+    setup_wm_parameters(wm, config, coin1_param, coin2_param, coin3_param, timezone_param,
                        sounds_param, simple_param, graph_param);
 
     // Start portal
     bool success = wm.startConfigPortal("crypto_display", "crypto123");
     
     // Save config
-    ConfigParams new_config = get_wm_values(coin1_param, coin2_param, coin3_param,
+    ConfigParams new_config = get_wm_values(coin1_param, coin2_param, coin3_param, timezone_param,
                                            sounds_param, simple_param, graph_param);
     
     if (!new_config.coin1.isEmpty()) {

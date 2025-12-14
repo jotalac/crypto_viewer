@@ -58,7 +58,7 @@ bool check_reset_button() {
 
 
 
-bool check_coin_change_button() {
+bool check_screen_change_button() {
     static unsigned long button_press_start = 0;
     static bool button_was_pressed = false;
     

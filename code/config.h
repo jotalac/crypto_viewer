@@ -9,6 +9,7 @@
 #include <ArduinoJson.h>
 #include <Preferences.h>
 #include <TFT_eSPI.h>
+#include <ezTime.h>
 #include <vector>
 #include <string>
 #include <cstdio>
@@ -16,6 +17,7 @@
 // extern variables
 extern Preferences preferences; 
 extern TFT_eSPI tft;
+extern Timezone myTZ;
 
 // button
 #define PORTAL_TIMEOUT 120 // 2 minutes wait in wifi config mode

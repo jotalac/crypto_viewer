@@ -20,12 +20,14 @@ std::string format_price_change(float price_change, int precision);
 
 void turn_on_external_antenna();
 
+bool setup_time();
+
 
 String get_coin_name();
 String get_coin_name(int index);
 void set_coin_names(String coin1, String coin2, String coin3);
-int get_current_coin_index();
-void set_current_coin_index(int index);
+int get_current_screen_index();
+void set_current_screen_index(int index);
 
 void set_play_sounds(String val);
 bool should_play_sounds();
@@ -33,5 +35,10 @@ bool should_play_sounds();
 bool is_simple_layout();
 bool should_display_graph();
 
-bool go_to_next_coin();
-int get_coin_count(); //how many coins are configured
+String get_timezone();
+// void set_timezone(String val);
+
+bool go_to_next_screen();
+int get_screen_count(); //how many coins are configured
+
+

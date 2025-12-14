@@ -4,6 +4,7 @@ struct ConfigParams {
     String coin1;
     String coin2;
     String coin3;
+    String timezone;
     String play_sounds;
     String simple_layout;
     String display_graph;
@@ -17,6 +18,7 @@ void setup_wm_parameters(WiFiManager& wm, const ConfigParams& config,
                         WiFiManagerParameter& coin1_param,
                         WiFiManagerParameter& coin2_param,
                         WiFiManagerParameter& coin3_param,
+                        WiFiManagerParameter& timezone_param,
                         WiFiManagerParameter& sounds_param,
                         WiFiManagerParameter& simple_param,
                         WiFiManagerParameter& graph_param);
@@ -24,6 +26,7 @@ void setup_wm_parameters(WiFiManager& wm, const ConfigParams& config,
 ConfigParams get_wm_values(WiFiManagerParameter& coin1_param,
                            WiFiManagerParameter& coin2_param,
                            WiFiManagerParameter& coin3_param,
+                           WiFiManagerParameter& timezone_param,
                            WiFiManagerParameter& sounds_param,
                            WiFiManagerParameter& simple_param,
                            WiFiManagerParameter& graph_param);

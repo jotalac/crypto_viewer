@@ -26,6 +26,8 @@ CoinData fetch_coin_data();
 
 GraphData fetch_graph_data();
 
+int fetch_timestamp();
+
 
 
 #endif

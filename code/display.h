@@ -19,3 +19,5 @@ void display_message(String message);
 void display_wifi_setup_message(String message);
 
 void draw_graph(GraphData graph_data, bool is_growing);
+
+void render_screen_clock();
