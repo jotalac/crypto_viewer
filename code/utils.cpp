@@ -104,7 +104,8 @@ void setup_time() {
     Serial.println("Timezone is:" + get_timezone());
 
     if(!myTZ.setLocation(get_timezone())) {
-        set_timezone("Invalid timezone");
+        // set_timezone("Invalid timezone");
+        Serial.println("Failed to set timezone.")
     };
 }
 
