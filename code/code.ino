@@ -11,12 +11,12 @@ const unsigned long FETCH_INTERVAL = 1000 * 60 * 10;  // 10 minutes
 const unsigned long FETCH_GRAPH_INTERVAL = 1000 * 60 * 60;  // 1 hour
 CoinData all_coins_data[3] = {{}, {}, {}};
 GraphData all_graph_data[3] = {{}, {}, {}};
-int cur_screen_i = 0;
-int total_screens = get_screen_count();
-
+int total_screens = 0;
 
 void setup() {
   Serial.begin(9600);
+
+  total_screens = get_screen_count();
 
   // setup buttons and anthena  pins
   pinMode(BUTTON_COIN_PIN, INPUT_PULLUP);
@@ -63,7 +63,6 @@ void loop() {
   }
   else {
     //check if we should fetch new data
-    if (cur_screen_i == total_screens-1) return;
     unsigned long current_time = millis();
     if (current_time - last_fetch_time >= FETCH_INTERVAL || last_fetch_time == 0) {
       Serial.println("Fetching new price...");
