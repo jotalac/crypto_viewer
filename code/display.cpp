@@ -231,15 +231,17 @@ void draw_graph(GraphData graph_data, bool is_growing) {
     int y1 = bottomY - ((graph_data.price_history[i] - graph_data.min_price) / range) * graphH;
     int y2 = bottomY - ((graph_data.price_history[i+1] - graph_data.min_price) / range) * graphH;
 
-    // We draw two triangles to fill the trapezoid shape under the line
-    // Triangle 1: Top-Left, Top-Right, Bottom-Left
-    tft.fillTriangle(x1, y1, x2, y2, x1, tft.height(), FILL_COLOR);
-    // Triangle 2: Bottom-Left, Top-Right, Bottom-Right
-    tft.fillTriangle(x1, tft.height(), x2, y2, x2, tft.height(), FILL_COLOR);
+    // fill the space under the graph
+    // tft.fillTriangle(x1, y1, x2, y2, x1, tft.height(), FILL_COLOR);
+    // tft.fillTriangle(x1, tft.height(), x2, y2, x2, tft.height(), FILL_COLOR);
 
-    // Draw the main line
-    tft.drawWideLine(x1, y1 , x2, y2, 5, LINE_COLOR, TFT_BLACK);
-    // tft.drawLine(x1, y1, x2, y2, LINE_COLOR);
+    // Draw the graph line
+    // tft.drawWideLine(x1, y1 , x2, y2, 5, LINE_COLOR, TFT_BLACK);
+
+    uint16_t line_color = y1 > y2 ? TFT_GREEN : TFT_RED;
+
+
+    tft.drawWideLine(x1, y1, x1, y2, xSpacing - 2, line_color);
     
   }
 }
