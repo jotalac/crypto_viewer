@@ -231,17 +231,18 @@ void draw_graph(GraphData graph_data, bool is_growing) {
     int y1 = bottomY - ((graph_data.price_history[i] - graph_data.min_price) / range) * graphH;
     int y2 = bottomY - ((graph_data.price_history[i+1] - graph_data.min_price) / range) * graphH;
 
+  
     // fill the space under the graph
-    // tft.fillTriangle(x1, y1, x2, y2, x1, tft.height(), FILL_COLOR);
-    // tft.fillTriangle(x1, tft.height(), x2, y2, x2, tft.height(), FILL_COLOR);
+    tft.fillTriangle(x1, y1, x2, y2, x1, tft.height(), FILL_COLOR);
+    tft.fillTriangle(x1, tft.height(), x2, y2, x2, tft.height(), FILL_COLOR);
 
     // Draw the graph line
-    // tft.drawWideLine(x1, y1 , x2, y2, 5, LINE_COLOR, TFT_BLACK);
-
-    uint16_t line_color = y1 > y2 ? TFT_GREEN : TFT_RED;
+    tft.drawWideLine(x1, y1 , x2, y2, 5, LINE_COLOR, TFT_BLACK);
 
 
-    tft.drawWideLine(x1, y1, x1, y2, xSpacing - 2, line_color);
+    // draw graph with verical lines
+    // uint16_t line_color = y1 > y2 ? TFT_GREEN : TFT_RED;
+    // tft.drawWideLine(x1, y1, x1, y2, xSpacing - 2, line_color);
     
   }
 }
